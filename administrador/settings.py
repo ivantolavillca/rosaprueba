@@ -100,7 +100,7 @@ WSGI_APPLICATION = 'administrador.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
+    'default': dj_database_url.parse(os.environ.get('DATABASE_URL','postgresql://db_prueba_oahu_user:IGvQoQfa9AT2EjqdKMmWnqsUI3WzOIuF@dpg-cv1of852ng1s738jcfag-a.oregon-postgres.render.com/db_prueba_oahu'))
 }
 
 
