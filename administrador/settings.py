@@ -100,12 +100,12 @@ WSGI_APPLICATION = 'administrador.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',  
-        'NAME': 'rosa_db',           
-        'USER': 'navitv',                  
-        'PASSWORD': 'y907CjbF0C9EG1vyx9olX',          
-        'HOST': 'navitv.mysql.pythonanywhere-services.com',                  
-        'PORT': '3306', 
+        'ENGINE': 'django.db.backends.postgresql',  
+        'NAME': 'db_prueba_oahu',           
+        'USER': 'db_prueba_oahu_user',                  
+        'PASSWORD': 'IGvQoQfa9AT2EjqdKMmWnqsUI3WzOIuF',          
+        'HOST': 'dpg-cv1of852ng1s738jcfag-a',                  
+        'PORT': '5432', 
     }
 }
 
