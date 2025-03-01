@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-4t@_@yr$rrb@&#x_h7l@zo83afo3+kb6jk_%gxsun0y4)e*mc!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -71,9 +71,10 @@ SWAGGER_SETTINGS = {
     "USE_SESSION_AUTH": False,
 }
 
-CORS_ALLOWED_ORIGINS = [
-    "*",
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "*",
+# ]
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'administrador.urls'
 
