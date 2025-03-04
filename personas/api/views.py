@@ -8,6 +8,7 @@ from rest_framework.filters import SearchFilter
 from personas.api.permissions import IsAdminOrReadOnly
 from personas.api.serializers import PersonaSerializer, ReportPersonaSerializer
 from personas.models import Personas
+from rest_framework.pagination import PageNumberPagination
 
 class PersonaApiViewSet(ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
@@ -15,7 +16,8 @@ class PersonaApiViewSet(ModelViewSet):
     serializer_class = PersonaSerializer
     filter_backends = [SearchFilter]
     search_fields = ['nombre_completo', 'edad', 'peso', 'estatura']
-
+    pagination_class = PageNumberPagination
+    page_size = 10
     def perform_destroy(self, instance):
         instance.is_delete = True
         instance.save()

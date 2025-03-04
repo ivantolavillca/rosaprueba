@@ -1,18 +1,15 @@
 from rest_framework import serializers
-from personas.models import Personas, Clasificacion  # Asegúrate de importar el modelo Clasificacion
+from personas.models import Personas, Clasificacion 
+from clasificacion_peso.api.serializers import ClasificacionSerializer
 from decimal import Decimal
 from django.core.exceptions import ValidationError
 
 from rest_framework import serializers
 from personas.models import Clasificacion
 
-class ClasificacionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Clasificacion
-        fields = ['id', 'nombre']
-        ref_name = 'ClasificacionPersonasSerializer'  # Nombre único para este serializador
+
 class PersonaSerializer(serializers.ModelSerializer):
-    clasificacion = ClasificacionSerializer(read_only=True)  # Muestra el nombre de la clasificación
+    clasificacion = ClasificacionSerializer(read_only=True)
 
     class Meta:
         model = Personas
