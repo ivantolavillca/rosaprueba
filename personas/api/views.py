@@ -8,19 +8,18 @@ from rest_framework.filters import SearchFilter
 from personas.api.permissions import IsAdminOrReadOnly
 from personas.api.serializers import PersonaSerializer, ReportPersonaSerializer
 from personas.models import Personas
-from rest_framework.pagination import PageNumberPagination
+from rest_framework.pagination import LimitOffsetPagination
 
-class CustomPagination(PageNumberPagination):
-    page_size = 10  # Número de registros por página
-    page_size_query_param = 'page_size'  # Permite ajustar el tamaño de la página desde la URL
-    max_page_size = 100  # Límite máximo de registros por página
+class CustomLimitOffsetPagination(LimitOffsetPagination):
+    default_limit = 10  # Número de registros por defecto
+    max_limit = 100  # Límite máximo de registros
 class PersonaApiViewSet(ModelViewSet):
-    permission_classes = [IsAdminOrReadOnly]
+    #permission_classes = [IsAdminOrReadOnly]
     queryset = Personas.objects.filter(is_delete=False)
     serializer_class = PersonaSerializer
     filter_backends = [SearchFilter]
     search_fields = ['nombre_completo', 'edad', 'peso', 'estatura']
-    pagination_class = CustomPagination
+    pagination_class = CustomLimitOffsetPagination 
     
     def perform_destroy(self, instance):
         instance.is_delete = True
