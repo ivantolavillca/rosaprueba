@@ -10,14 +10,18 @@ from personas.api.serializers import PersonaSerializer, ReportPersonaSerializer
 from personas.models import Personas
 from rest_framework.pagination import PageNumberPagination
 
+class CustomPagination(PageNumberPagination):
+    page_size = 10  # Número de registros por página
+    page_size_query_param = 'page_size'  # Permite ajustar el tamaño de la página desde la URL
+    max_page_size = 100  # Límite máximo de registros por página
 class PersonaApiViewSet(ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
     queryset = Personas.objects.filter(is_delete=False)
     serializer_class = PersonaSerializer
     filter_backends = [SearchFilter]
     search_fields = ['nombre_completo', 'edad', 'peso', 'estatura']
-    pagination_class = PageNumberPagination
-    page_size = 10
+    pagination_class = CustomPagination
+    
     def perform_destroy(self, instance):
         instance.is_delete = True
         instance.save()
