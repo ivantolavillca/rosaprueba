@@ -15,6 +15,7 @@ import tensorflow as tf
 import numpy as np
 import joblib
 #model_path = os.path.join(settings.BASE_DIR, 'personas', 'obesidad_model.keras')
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 model_path = os.path.join(settings.BASE_DIR, 'personas', 'obesidad_model.keras')
 scaler_path = os.path.join(settings.BASE_DIR, 'personas', 'scaler.pkl')
 label_encoder_path = os.path.join(settings.BASE_DIR, 'personas', 'label_encoder.pkl')
