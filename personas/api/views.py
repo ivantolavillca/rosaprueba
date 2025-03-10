@@ -30,7 +30,13 @@ class PredecirObesidadView(APIView):
         peso = serializer.validated_data['peso']
         estatura = serializer.validated_data['estatura']
         imc = peso / (estatura ** 2)
-        datos_entrada = np.array([[edad, peso, estatura, imc]], dtype=np.float32)
+        datos_entrada = pd.DataFrame({
+            'edad': [edad],
+            'peso': [peso],
+            'estatura': [estatura],
+            'imc': [imc]
+        })
+       # datos_entrada = np.array([[edad, peso, estatura, imc]], dtype=np.float32)
         datos_entrada = scaler.transform(datos_entrada) 
         try:
            prediccion = model.predict(datos_entrada)
