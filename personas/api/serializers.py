@@ -38,3 +38,8 @@ class ReportPersonaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Personas
         fields = ['nombre_completo', 'edad', 'peso', 'estatura', 'clasificacion', 'imc']
+        
+class ModeloDatos(serializers.Serializer):
+    edad = serializers.FloatField()
+    peso = serializers.FloatField()
+    estatura = serializers.FloatField()

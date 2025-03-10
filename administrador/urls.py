@@ -23,7 +23,7 @@ from drf_yasg.views import get_schema_view
 from personas.api.router import router_personas
 from clasificacion_peso.api.router import router_clasificacion
 from django.views.generic.base import RedirectView
-from personas.api.views import ExportDataView
+from personas.api.views import ExportDataView, PredecirObesidadView
 schema_view = get_schema_view(
    openapi.Info(
       title="MEDIDAS API",
@@ -52,4 +52,5 @@ urlpatterns = [
     path('api/', include(router_personas.urls)),
     path('api/', include(router_clasificacion.urls)),
     path('api/report/persona/', ExportDataView.as_view(), name='export-data'),
+    path('api/predecir-obesidad/', PredecirObesidadView.as_view(), name='predecir_obesidad'),
 ]
