@@ -51,6 +51,7 @@ urlpatterns = [
     path('api/', include('users.api.router')),
     path('api/', include(router_personas.urls)),
     path('api/', include(router_clasificacion.urls)),
+    path('api/', include('estadisticas.api.router')),
     path('api/report/persona/', ExportDataView.as_view(), name='export-data'),
     path('api/predecir-obesidad/', PredecirObesidadView.as_view(), name='predecir_obesidad'),
 ]

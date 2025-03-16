@@ -44,8 +44,8 @@ INSTALLED_APPS = [
     'drf_yasg',
     'users',
     'clasificacion_peso',
-    'personas'
-    
+    'personas',
+    'estadisticas',
 ]
 
 MIDDLEWARE = [
