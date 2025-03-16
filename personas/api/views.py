@@ -69,6 +69,7 @@ class PersonaApiViewSet(ModelViewSet):
             status=status.HTTP_200_OK
         )
 class ExportDataView(APIView):
+    permission_classes = [IsAdminOrReadOnly]
     def get(self, request, format=None):
         queryset = Personas.objects.filter(is_delete=False)
         serializer = ReportPersonaSerializer(queryset, many=True)
