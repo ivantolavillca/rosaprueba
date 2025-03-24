@@ -14,6 +14,18 @@ from django.conf import settings
 import tensorflow as tf
 import numpy as np
 import joblib
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Dense, Input
+from tensorflow.keras.utils import to_categorical
+from personas.models import Personas
+
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 model_path = os.path.join(settings.BASE_DIR, 'personas', 'obesidad_model.keras')
 scaler_path = os.path.join(settings.BASE_DIR, 'personas', 'scaler.pkl')
@@ -45,6 +57,139 @@ class PredecirObesidadView(APIView):
            clasificacion = label_encoder.inverse_transform([resultado])[0]
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'prediccion': clasificacion}, status=status.HTTP_200_OK)
+
+class EntrenarYPredecirApkView(APIView):
+    #permission_classes = [IsAdminOrReadOnly]
+    def post(self, request):
+        # Extraer datos de la base de datos
+        queryset = Personas.objects.filter(is_delete=False).values('edad', 'peso', 'estatura', 'clasificacion')
+        data = pd.DataFrame(queryset)
+
+        # Validar que haya datos suficientes
+        if data.empty or len(data) < 10:
+            return Response({'error': 'No hay suficientes datos para entrenar el modelo.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Preprocesar los datos
+        data = data.dropna()  # Eliminar filas con valores nulos
+        data['imc'] = data['peso'] / (data['estatura'] ** 2)  # Calcular el IMC
+        label_encoder = LabelEncoder()
+        data['clasificacion'] = label_encoder.fit_transform(data['clasificacion'])  # Codificar la variable objetivo
+
+        # Separar características y variable objetivo
+        X = data[['edad', 'peso', 'estatura', 'imc']]
+        y = data['clasificacion']
+        y = to_categorical(y)  # Convertir las etiquetas a one-hot encoding
+
+        # Dividir los datos en conjuntos de entrenamiento y prueba
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+        # Escalar las características
+        scaler = StandardScaler()
+        X_train = scaler.fit_transform(X_train)
+        X_test = scaler.transform(X_test)
+
+        # Construir el modelo de red neuronal
+        model = Sequential()
+        model.add(Input(shape=(X_train.shape[1],)))  # Capa de entrada
+        model.add(Dense(64, activation='relu'))  # Capa oculta 1
+        model.add(Dense(32, activation='relu'))  # Capa oculta 2
+        model.add(Dense(y.shape[1], activation='softmax'))  # Capa de salida
+
+        # Compilar el modelo
+        model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+        # Entrenar el modelo
+        model.fit(X_train, y_train, epochs=50, batch_size=32, validation_split=0.2, verbose=1)
+
+        # Realizar predicción con los datos enviados en la solicitud
+        entrada = request.data
+        try:
+            edad = entrada['edad']
+            peso = entrada['peso']
+            estatura = entrada['estatura']
+            imc = peso / (estatura ** 2)
+
+            datos_entrada = pd.DataFrame({
+                'edad': [edad],
+                'peso': [peso],
+                'estatura': [estatura],
+                'imc': [imc]
+            })
+            datos_entrada = scaler.transform(datos_entrada)
+            prediccion = model.predict(datos_entrada)
+            prediccion_clase = np.argmax(prediccion, axis=1)
+            resultado = int(prediccion_clase[0])
+            clasificacion = label_encoder.inverse_transform([resultado])[0]
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'prediccion': clasificacion}, status=status.HTTP_200_OK)
+class EntrenarYPredecirView(APIView):
+    permission_classes = [IsAdminOrReadOnly]
+    def post(self, request):
+        # Extraer datos de la base de datos
+        queryset = Personas.objects.filter(is_delete=False).values('edad', 'peso', 'estatura', 'clasificacion')
+        data = pd.DataFrame(queryset)
+
+        # Validar que haya datos suficientes
+        if data.empty or len(data) < 10:
+            return Response({'error': 'No hay suficientes datos para entrenar el modelo.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Preprocesar los datos
+        data = data.dropna()  # Eliminar filas con valores nulos
+        data['imc'] = data['peso'] / (data['estatura'] ** 2)  # Calcular el IMC
+        label_encoder = LabelEncoder()
+        data['clasificacion'] = label_encoder.fit_transform(data['clasificacion'])  # Codificar la variable objetivo
+
+        # Separar características y variable objetivo
+        X = data[['edad', 'peso', 'estatura', 'imc']]
+        y = data['clasificacion']
+        y = to_categorical(y)  # Convertir las etiquetas a one-hot encoding
+
+        # Dividir los datos en conjuntos de entrenamiento y prueba
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+        # Escalar las características
+        scaler = StandardScaler()
+        X_train = scaler.fit_transform(X_train)
+        X_test = scaler.transform(X_test)
+
+        # Construir el modelo de red neuronal
+        model = Sequential()
+        model.add(Input(shape=(X_train.shape[1],)))  # Capa de entrada
+        model.add(Dense(64, activation='relu'))  # Capa oculta 1
+        model.add(Dense(32, activation='relu'))  # Capa oculta 2
+        model.add(Dense(y.shape[1], activation='softmax'))  # Capa de salida
+
+        # Compilar el modelo
+        model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+        # Entrenar el modelo
+        model.fit(X_train, y_train, epochs=50, batch_size=32, validation_split=0.2, verbose=1)
+
+        # Realizar predicción con los datos enviados en la solicitud
+        entrada = request.data
+        try:
+            edad = entrada['edad']
+            peso = entrada['peso']
+            estatura = entrada['estatura']
+            imc = peso / (estatura ** 2)
+
+            datos_entrada = pd.DataFrame({
+                'edad': [edad],
+                'peso': [peso],
+                'estatura': [estatura],
+                'imc': [imc]
+            })
+            datos_entrada = scaler.transform(datos_entrada)
+            prediccion = model.predict(datos_entrada)
+            prediccion_clase = np.argmax(prediccion, axis=1)
+            resultado = int(prediccion_clase[0])
+            clasificacion = label_encoder.inverse_transform([resultado])[0]
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
         return Response({'prediccion': clasificacion}, status=status.HTTP_200_OK)
 
 class CustomLimitOffsetPagination(LimitOffsetPagination):
