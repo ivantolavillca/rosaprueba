@@ -10,6 +10,11 @@ from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.viewsets import ModelViewSet
 from personas.api.permissions import IsAdminOrReadOnly
 from rest_framework.filters import SearchFilter
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+from .serializers import UserProfileUpdateSerializer
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
     
@@ -57,41 +62,13 @@ class UserListView(APIView):
         users = User.objects.all().order_by('last_name')
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
-# class UserApiViewSet(ModelViewSet):
-#     permission_classes = [IsAdminOrReadOnly]
-#     queryset = User.objects.filter(is_delete=False)
-#     serializer_class = UserSerializer
-#     filter_backends = [SearchFilter]
-    #filterset_fields = ['nombre_completo','edad','peso','estatura']
-   # search_fields = ['nombre_completo', 'edad', 'peso', 'estatura']
-   # pagination_class = CustomPagination 
-    
-    # def create(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     self.perform_create(serializer)
-    #     return Response(
-    #         {"message": "Persona creada exitosamente."},
-    #         status=status.HTTP_200_OK
-    #     )
+class UserProfileUpdateView(APIView):
+    permission_classes = [IsAuthenticated]
 
-    # def put(self, request, *args, **kwargs):
-    #     partial = kwargs.pop('partial', False)
-    #     instance = self.get_object()
-    #     serializer = self.get_serializer(instance, data=request.data, partial=partial)
-    #     serializer.is_valid(raise_exception=True)
-    #     self.perform_update(serializer)
-    #     return Response(
-    #         {"message": "Persona actualizada exitosamente."},
-    #         status=status.HTTP_200_OK
-    #     )
-
-    # def destroy(self, request, *args, **kwargs):
-    #     instance = self.get_object()
-    #     instance.is_delete=True
-    #     instance.save()
-    #     #self.perform_destroy(instance)
-    #     return Response(
-    #         {"message": "Persona eliminada exitosamente."},
-    #         status=status.HTTP_200_OK
-    #     )
+    def put(self, request):
+        user = request.user
+        serializer = UserProfileUpdateSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
