@@ -29,7 +29,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
         token['user_id'] = user.id
-        token['username'] = f"{user.first_name} {user.last_name}".upper() 
+        token['first_name'] = user.first_name  # Agregar el nombre
+        token['last_name'] = user.last_name    # Agregar los apellidos
         token['email'] = user.email
         token['groups'] = list(user.groups.values_list('name', flat=True))  
         return token
