@@ -13,7 +13,7 @@ class PersonaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Personas
-        fields = ['id', 'nombre_completo', 'edad', 'peso', 'estatura', 'clasificacion', 'imc']
+        fields = ['id', 'nombre_completo', 'genero','edad', 'peso', 'estatura', 'clasificacion', 'imc']
 
     def validate_edad(self, value):
         if value < 13 or value > 18:
@@ -43,3 +43,4 @@ class ModeloDatos(serializers.Serializer):
     edad = serializers.FloatField()
     peso = serializers.FloatField()
     estatura = serializers.FloatField()
+    genero = serializers.FloatField()
