@@ -63,7 +63,7 @@ class EntrenarYPredecirApkView(APIView):
     #permission_classes = [IsAdminOrReadOnly]
     def post(self, request):
         # Extraer datos de la base de datos
-        queryset = Personas.objects.filter(is_delete=False).values('edad', 'peso', 'estatura', 'clasificacion')
+        queryset = Personas.objects.filter(is_delete=False).values('edad', 'peso', 'estatura', 'genero','clasificacion','imc')
         data = pd.DataFrame(queryset)
 
         # Validar que haya datos suficientes
@@ -72,12 +72,12 @@ class EntrenarYPredecirApkView(APIView):
 
         # Preprocesar los datos
         data = data.dropna()  # Eliminar filas con valores nulos
-        data['imc'] = data['peso'] / (data['estatura'] ** 2)  # Calcular el IMC
+        # data['imc'] = data['peso'] / (data['estatura'] ** 2)  # Calcular el IMC
         label_encoder = LabelEncoder()
         data['clasificacion'] = label_encoder.fit_transform(data['clasificacion'])  # Codificar la variable objetivo
 
         # Separar características y variable objetivo
-        X = data[['edad', 'peso', 'estatura', 'imc']]
+        X = data[['edad','genero', 'peso', 'estatura', 'imc']]
         y = data['clasificacion']
         y = to_categorical(y)  # Convertir las etiquetas a one-hot encoding
 
@@ -108,13 +108,15 @@ class EntrenarYPredecirApkView(APIView):
             edad = entrada['edad']
             peso = entrada['peso']
             estatura = entrada['estatura']
+            genero = entrada['genero']
             imc = peso / (estatura ** 2)
 
             datos_entrada = pd.DataFrame({
                 'edad': [edad],
                 'peso': [peso],
                 'estatura': [estatura],
-                'imc': [imc]
+                'imc': [imc],
+                'genero': [genero],
             })
             datos_entrada = scaler.transform(datos_entrada)
             prediccion = model.predict(datos_entrada)
@@ -129,7 +131,7 @@ class EntrenarYPredecirView(APIView):
     permission_classes = [IsAdminOrReadOnly]
     def post(self, request):
         # Extraer datos de la base de datos
-        queryset = Personas.objects.filter(is_delete=False).values('edad', 'peso', 'estatura', 'clasificacion')
+        queryset = Personas.objects.filter(is_delete=False).values('edad', 'peso', 'estatura','genero', 'clasificacion','imc')
         data = pd.DataFrame(queryset)
 
         # Validar que haya datos suficientes
@@ -138,12 +140,12 @@ class EntrenarYPredecirView(APIView):
 
         # Preprocesar los datos
         data = data.dropna()  # Eliminar filas con valores nulos
-        data['imc'] = data['peso'] / (data['estatura'] ** 2)  # Calcular el IMC
+        # data['imc'] = data['peso'] / (data['estatura'] ** 2)  # Calcular el IMC
         label_encoder = LabelEncoder()
         data['clasificacion'] = label_encoder.fit_transform(data['clasificacion'])  # Codificar la variable objetivo
 
         # Separar características y variable objetivo
-        X = data[['edad', 'peso', 'estatura', 'imc']]
+        X = data[['edad', 'peso', 'estatura', 'imc', 'genero']]
         y = data['clasificacion']
         y = to_categorical(y)  # Convertir las etiquetas a one-hot encoding
 
@@ -174,13 +176,15 @@ class EntrenarYPredecirView(APIView):
             edad = entrada['edad']
             peso = entrada['peso']
             estatura = entrada['estatura']
+            genero = entrada['genero']
             imc = peso / (estatura ** 2)
 
             datos_entrada = pd.DataFrame({
                 'edad': [edad],
                 'peso': [peso],
                 'estatura': [estatura],
-                'imc': [imc]
+                'imc': [imc],
+                'genero': [genero]
             })
             datos_entrada = scaler.transform(datos_entrada)
             prediccion = model.predict(datos_entrada)
@@ -200,7 +204,7 @@ class PersonaApiViewSet(ModelViewSet):
     queryset = Personas.objects.filter(is_delete=False)
     serializer_class = PersonaSerializer
     filter_backends = [SearchFilter]
-    search_fields = ['nombre_completo', 'edad', 'peso', 'estatura']
+    search_fields = ['nombre_completo','genero', 'edad', 'peso', 'estatura']
     pagination_class = CustomLimitOffsetPagination
     def perform_destroy(self, instance):
         instance.is_delete = True

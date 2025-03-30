@@ -41,8 +41,16 @@ class ClasificacionPorEdadView(APIView):
         df = pd.DataFrame(data)
         estadisticas = df.groupby('edad')['clasificacion'].describe().to_dict()
         return Response(estadisticas, status=status.HTTP_200_OK)
+class ClasificacionPorGeneroView(APIView):
+    permission_classes = [IsAdminOrReadOnly]
+
+    def get(self, request):
+        data = Personas.objects.filter(is_delete=False).values('genero', 'clasificacion')
+        df = pd.DataFrame(data)
+        estadisticas = df.groupby('genero')['clasificacion'].describe().to_dict()
+        return Response(estadisticas, status=status.HTTP_200_OK)
 class EdadPorClasificacionView(APIView):
-    #permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
 
     def get(self, request):
         data = Personas.objects.filter(is_delete=False).values('clasificacion', 'edad')

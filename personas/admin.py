@@ -3,7 +3,7 @@ from .models import Personas
 
 @admin.register(Personas)
 class PersonaAdmin(admin.ModelAdmin):
-    list_display = ['nombre_completo', 'edad', 'peso', 'estatura', 'imc', 'clasificacion', 'created_at']
+    list_display = ['nombre_completo','genero', 'edad', 'peso', 'estatura', 'imc', 'clasificacion', 'created_at']
     list_filter = ['clasificacion']
 
     def delete_model(self, request, obj):
