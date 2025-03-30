@@ -25,6 +25,7 @@ from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.utils import to_categorical
 from personas.models import Personas
+from sklearn.preprocessing import LabelEncoder
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 model_path = os.path.join(settings.BASE_DIR, 'personas', 'obesidad_model.keras')
@@ -176,9 +177,9 @@ class EntrenarYPredecirView(APIView):
             edad = entrada['edad']
             peso = entrada['peso']
             estatura = entrada['estatura']
-            genero = entrada['genero']
+            #genero = entrada['genero']
             imc = peso / (estatura ** 2)
-
+           
             datos_entrada = pd.DataFrame({
                 'edad': [edad],
                 'peso': [peso],
