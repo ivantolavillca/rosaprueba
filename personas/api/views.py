@@ -43,9 +43,11 @@ class PredecirObesidadView(APIView):
         edad = serializer.validated_data['edad']
         peso = serializer.validated_data['peso']
         estatura = serializer.validated_data['estatura']
+        genero = serializer.validated_data['genero']
         imc = peso / (estatura ** 2)
         datos_entrada = pd.DataFrame({
             'edad': [edad],
+            'genero': [genero],
             'peso': [peso],
             'estatura': [estatura],
             'imc': [imc]
@@ -60,17 +62,45 @@ class PredecirObesidadView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response({'prediccion': clasificacion}, status=status.HTTP_200_OK)
 
+class PredecirObesidadApkView(APIView):
+    #permission_classes = [IsAdminOrReadOnly]
+    def post(self, request):
+        serializer = ModeloDatos(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        edad = serializer.validated_data['edad']
+        peso = serializer.validated_data['peso']
+        estatura = serializer.validated_data['estatura']
+        genero = serializer.validated_data['genero']
+        imc = peso / (estatura ** 2)
+        datos_entrada = pd.DataFrame({
+            'edad': [edad],
+            'genero': [genero],
+            'peso': [peso],
+            'estatura': [estatura],
+            'imc': [imc]
+        })
+        datos_entrada = scaler.transform(datos_entrada)
+        try:
+           prediccion = model.predict(datos_entrada)
+           prediccion_clase = np.argmax(prediccion, axis=1)
+           resultado = int(prediccion_clase[0])
+           clasificacion = label_encoder.inverse_transform([resultado])[0]
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'prediccion': clasificacion}, status=status.HTTP_200_OK)
+
+
 class EntrenarYPredecirApkView(APIView):
     #permission_classes = [IsAdminOrReadOnly]
     def post(self, request):
         # Extraer datos de la base de datos
-        queryset = Personas.objects.filter(is_delete=False).values('edad', 'peso', 'estatura', 'genero','clasificacion','imc')
+        queryset = Personas.objects.filter(is_delete=False).values('edad','genero', 'peso', 'estatura','clasificacion','imc')
         data = pd.DataFrame(queryset)
-
         # Validar que haya datos suficientes
         if data.empty or len(data) < 10:
             return Response({'error': 'No hay suficientes datos para entrenar el modelo.'}, status=status.HTTP_400_BAD_REQUEST)
-
+        data['genero'] = data['genero'].map({'Masculino': 1, 'Femenino': 0})
         # Preprocesar los datos
         data = data.dropna()  # Eliminar filas con valores nulos
         # data['imc'] = data['peso'] / (data['estatura'] ** 2)  # Calcular el IMC
@@ -107,17 +137,17 @@ class EntrenarYPredecirApkView(APIView):
         entrada = request.data
         try:
             edad = entrada['edad']
+            genero = entrada['genero']
             peso = entrada['peso']
             estatura = entrada['estatura']
-            genero = entrada['genero']
             imc = peso / (estatura ** 2)
 
             datos_entrada = pd.DataFrame({
                 'edad': [edad],
+                'genero': [genero],
                 'peso': [peso],
                 'estatura': [estatura],
                 'imc': [imc],
-                'genero': [genero],
             })
             datos_entrada = scaler.transform(datos_entrada)
             prediccion = model.predict(datos_entrada)
@@ -138,7 +168,7 @@ class EntrenarYPredecirView(APIView):
         # Validar que haya datos suficientes
         if data.empty or len(data) < 10:
             return Response({'error': 'No hay suficientes datos para entrenar el modelo.'}, status=status.HTTP_400_BAD_REQUEST)
-
+        data['genero'] = data['genero'].map({'Masculino': 1, 'Femenino': 0})
         # Preprocesar los datos
         data = data.dropna()  # Eliminar filas con valores nulos
         # data['imc'] = data['peso'] / (data['estatura'] ** 2)  # Calcular el IMC
@@ -146,7 +176,7 @@ class EntrenarYPredecirView(APIView):
         data['clasificacion'] = label_encoder.fit_transform(data['clasificacion'])  # Codificar la variable objetivo
 
         # Separar características y variable objetivo
-        X = data[['edad', 'peso', 'estatura', 'imc', 'genero']]
+        X = data[['edad','genero', 'peso', 'estatura', 'imc']]
         y = data['clasificacion']
         y = to_categorical(y)  # Convertir las etiquetas a one-hot encoding
 
@@ -174,18 +204,18 @@ class EntrenarYPredecirView(APIView):
         # Realizar predicción con los datos enviados en la solicitud
         entrada = request.data
         try:
+            genero = entrada['genero']
             edad = entrada['edad']
             peso = entrada['peso']
             estatura = entrada['estatura']
-            #genero = entrada['genero']
             imc = peso / (estatura ** 2)
-           
             datos_entrada = pd.DataFrame({
                 'edad': [edad],
+                'genero': [genero],
                 'peso': [peso],
                 'estatura': [estatura],
                 'imc': [imc],
-                'genero': [genero]
+                
             })
             datos_entrada = scaler.transform(datos_entrada)
             prediccion = model.predict(datos_entrada)
