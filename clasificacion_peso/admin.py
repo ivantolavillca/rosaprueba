@@ -11,3 +11,6 @@ class ClasificacionAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
         return queryset.filter(is_delete=False)
+admin.site.site_header = "ADMINISTRACIÓN DE CLASIFICACIÓN DE PESO"
+admin.site.site_title = "CLASIFICACIÓN DE PESO"
+admin.site.index_title = "GESTIÓN DE CLASIFICACIÓN DE PESO"

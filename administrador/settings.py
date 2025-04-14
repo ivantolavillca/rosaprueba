@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 import dj_database_url
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -44,6 +45,14 @@ INSTALLED_APPS = [
     'drf_yasg',
     'users',
     'clasificacion_peso',
+    'genero',
+    'antecedentes_familiares',
+    'consumo_medicamentos',
+    'condiciones_medicas',
+    'estres_ansiedad',
+    'actividades_fisicas',
+    'comida_diaria',
+    'consumo_comida_rapida',
     'personas',
     'estadisticas',
 ]
@@ -102,7 +111,7 @@ WSGI_APPLICATION = 'administrador.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.parse(os.environ.get('DATABASE_URL','postgresql://neondb_owner:npg_XCMA3dv0oBTi@ep-nameless-truth-a8u7kakr-pooler.eastus2.azure.neon.tech/neondb?sslmode=require'))
+    'default': dj_database_url.parse(os.environ.get('DATABASE_URL','postgresql://navito_owner:npg_zUcIAp02QPLf@ep-still-morning-ace56eef-pooler.sa-east-1.aws.neon.tech/navito?sslmode=require'))
 }
 
 
@@ -148,8 +157,8 @@ from datetime import timedelta
 
 SIMPLE_JWT = {
     "TOKEN_OBTAIN_SERIALIZER": "users.api.serializers.CustomTokenObtainPairSerializer",
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=365),     
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=180),  
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),     
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'ALGORITHM': 'HS256',

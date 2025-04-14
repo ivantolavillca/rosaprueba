@@ -44,13 +44,27 @@ class PredecirObesidadView(APIView):
         peso = serializer.validated_data['peso']
         estatura = serializer.validated_data['estatura']
         genero = serializer.validated_data['genero']
+        antecedentes_familiares = serializer.validated_data['antecedentes_familiares']
+        condiciones_medicas = serializer.validated_data['condiciones_medicas']
+        consumo_medicamentos = serializer.validated_data['consumo_medicamentos']
+        estres_ansiedad = serializer.validated_data['estres_ansiedad']
+        actividades_fisicas = serializer.validated_data['actividades_fisicas']
+        consumo_comida_rapida = serializer.validated_data['consumo_comida_rapida']
+        comida_diaria = serializer.validated_data['comida_diaria']
         imc = peso / (estatura ** 2)
         datos_entrada = pd.DataFrame({
             'edad': [edad],
             'genero': [genero],
             'peso': [peso],
             'estatura': [estatura],
-            'imc': [imc]
+            'imc': [imc],
+            'antecedentes_familiares': [antecedentes_familiares],
+            'condiciones_medicas': [condiciones_medicas],
+            'consumo_medicamentos': [consumo_medicamentos],
+            'estres_ansiedad': [estres_ansiedad],
+            'actividades_fisicas': [actividades_fisicas],
+            'consumo_comida_rapida': [consumo_comida_rapida],
+            'comida_diaria': [comida_diaria],
         })
         datos_entrada = scaler.transform(datos_entrada)
         try:
@@ -72,13 +86,27 @@ class PredecirObesidadApkView(APIView):
         peso = serializer.validated_data['peso']
         estatura = serializer.validated_data['estatura']
         genero = serializer.validated_data['genero']
+        antecedentes_familiares = serializer.validated_data['antecedentes_familiares']
+        condiciones_medicas = serializer.validated_data['condiciones_medicas']
+        consumo_medicamentos = serializer.validated_data['consumo_medicamentos']
+        estres_ansiedad = serializer.validated_data['estres_ansiedad']
+        actividades_fisicas = serializer.validated_data['actividades_fisicas']
+        consumo_comida_rapida = serializer.validated_data['consumo_comida_rapida']
+        comida_diaria = serializer.validated_data['comida_diaria']
         imc = peso / (estatura ** 2)
         datos_entrada = pd.DataFrame({
             'edad': [edad],
             'genero': [genero],
             'peso': [peso],
             'estatura': [estatura],
-            'imc': [imc]
+            'imc': [imc],
+            'antecedentes_familiares': [antecedentes_familiares],
+            'condiciones_medicas': [condiciones_medicas],
+            'consumo_medicamentos': [consumo_medicamentos],
+            'estres_ansiedad': [estres_ansiedad],
+            'actividades_fisicas': [actividades_fisicas],
+            'consumo_comida_rapida': [consumo_comida_rapida],
+            'comida_diaria': [comida_diaria],
         })
         datos_entrada = scaler.transform(datos_entrada)
         try:
@@ -95,12 +123,12 @@ class EntrenarYPredecirApkView(APIView):
     #permission_classes = [IsAdminOrReadOnly]
     def post(self, request):
         # Extraer datos de la base de datos
-        queryset = Personas.objects.filter(is_delete=False).values('edad','genero', 'peso', 'estatura','clasificacion','imc')
+        queryset = Personas.objects.filter(is_delete=False).values('edad','genero', 'peso', 'estatura','antecedentes_familiares','condiciones_medicas','consumo_medicamentos','estres_ansiedad','actividades_fisicas','comida_diaria','consumo_comida_rapida', 'clasificacion','imc')
         data = pd.DataFrame(queryset)
         # Validar que haya datos suficientes
         if data.empty or len(data) < 10:
             return Response({'error': 'No hay suficientes datos para entrenar el modelo.'}, status=status.HTTP_400_BAD_REQUEST)
-        data['genero'] = data['genero'].map({'Masculino': 1, 'Femenino': 0})
+        # data['genero'] = data['genero'].map({'Masculino': 1, 'Femenino': 0})
         # Preprocesar los datos
         data = data.dropna()  # Eliminar filas con valores nulos
         # data['imc'] = data['peso'] / (data['estatura'] ** 2)  # Calcular el IMC
@@ -108,7 +136,7 @@ class EntrenarYPredecirApkView(APIView):
         data['clasificacion'] = label_encoder.fit_transform(data['clasificacion'])  # Codificar la variable objetivo
 
         # Separar características y variable objetivo
-        X = data[['edad','genero', 'peso', 'estatura', 'imc']]
+        X = data[['edad','genero', 'peso', 'estatura', 'imc','antecedentes_familiares','condiciones_medicas','consumo_medicamentos','estres_ansiedad','actividades_fisicas','comida_diaria','consumo_comida_rapida', 'clasificacion']]
         y = data['clasificacion']
         y = to_categorical(y)  # Convertir las etiquetas a one-hot encoding
 
@@ -139,6 +167,13 @@ class EntrenarYPredecirApkView(APIView):
             edad = entrada['edad']
             genero = entrada['genero']
             peso = entrada['peso']
+            antecedentes_familiares = entrada['antecedentes_familiares']
+            condiciones_medicas = entrada['condiciones_medicas']
+            consumo_medicamentos = entrada['consumo_medicamentos']
+            estres_ansiedad = entrada['estres_ansiedad']
+            actividades_fisicas = entrada['actividades_fisicas']
+            consumo_comida_rapida = entrada['consumo_comida_rapida']
+            comida_diaria = entrada['comida_diaria']
             estatura = entrada['estatura']
             imc = peso / (estatura ** 2)
 
@@ -148,6 +183,13 @@ class EntrenarYPredecirApkView(APIView):
                 'peso': [peso],
                 'estatura': [estatura],
                 'imc': [imc],
+                'antecedentes_familiares': [antecedentes_familiares],
+                'condiciones_medicas': [condiciones_medicas],
+                'consumo_medicamentos': [consumo_medicamentos],
+                'estres_ansiedad': [estres_ansiedad],
+                'actividades_fisicas': [actividades_fisicas],
+                'consumo_comida_rapida': [consumo_comida_rapida],
+                'comida_diaria': [comida_diaria],
             })
             datos_entrada = scaler.transform(datos_entrada)
             prediccion = model.predict(datos_entrada)
@@ -162,13 +204,13 @@ class EntrenarYPredecirView(APIView):
     permission_classes = [IsAdminOrReadOnly]
     def post(self, request):
         # Extraer datos de la base de datos
-        queryset = Personas.objects.filter(is_delete=False).values('edad', 'peso', 'estatura','genero', 'clasificacion','imc')
+        queryset = Personas.objects.filter(is_delete=False).values('edad', 'peso', 'estatura','genero','antecedentes_familiares','condiciones_medicas','consumo_medicamentos','estres_ansiedad','actividades_fisicas','comida_diaria','consumo_comida_rapida',  'clasificacion','imc')
         data = pd.DataFrame(queryset)
 
         # Validar que haya datos suficientes
         if data.empty or len(data) < 10:
             return Response({'error': 'No hay suficientes datos para entrenar el modelo.'}, status=status.HTTP_400_BAD_REQUEST)
-        data['genero'] = data['genero'].map({'Masculino': 1, 'Femenino': 0})
+        # data['genero'] = data['genero'].map({'Masculino': 1, 'Femenino': 0})
         # Preprocesar los datos
         data = data.dropna()  # Eliminar filas con valores nulos
         # data['imc'] = data['peso'] / (data['estatura'] ** 2)  # Calcular el IMC
@@ -176,7 +218,7 @@ class EntrenarYPredecirView(APIView):
         data['clasificacion'] = label_encoder.fit_transform(data['clasificacion'])  # Codificar la variable objetivo
 
         # Separar características y variable objetivo
-        X = data[['edad','genero', 'peso', 'estatura', 'imc']]
+        X = data[['edad','genero', 'peso', 'estatura', 'imc','antecedentes_familiares','condiciones_medicas','consumo_medicamentos','estres_ansiedad','actividades_fisicas','comida_diaria','consumo_comida_rapida', 'clasificacion']]
         y = data['clasificacion']
         y = to_categorical(y)  # Convertir las etiquetas a one-hot encoding
 
@@ -208,6 +250,13 @@ class EntrenarYPredecirView(APIView):
             edad = entrada['edad']
             peso = entrada['peso']
             estatura = entrada['estatura']
+            antecedentes_familiares = entrada['antecedentes_familiares']
+            condiciones_medicas = entrada['condiciones_medicas']
+            consumo_medicamentos = entrada['consumo_medicamentos']
+            estres_ansiedad = entrada['estres_ansiedad']
+            actividades_fisicas = entrada['actividades_fisicas']
+            consumo_comida_rapida = entrada['consumo_comida_rapida']
+            comida_diaria = entrada['comida_diaria']
             imc = peso / (estatura ** 2)
             datos_entrada = pd.DataFrame({
                 'edad': [edad],
@@ -215,7 +264,13 @@ class EntrenarYPredecirView(APIView):
                 'peso': [peso],
                 'estatura': [estatura],
                 'imc': [imc],
-                
+                'antecedentes_familiares': [antecedentes_familiares],
+                'condiciones_medicas': [condiciones_medicas],
+                'consumo_medicamentos': [consumo_medicamentos],
+                'estres_ansiedad': [estres_ansiedad],
+                'actividades_fisicas': [actividades_fisicas],
+                'consumo_comida_rapida': [consumo_comida_rapida],
+                'comida_diaria': [comida_diaria],
             })
             datos_entrada = scaler.transform(datos_entrada)
             prediccion = model.predict(datos_entrada)
