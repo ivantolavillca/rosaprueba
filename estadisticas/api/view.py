@@ -57,3 +57,11 @@ class EdadPorClasificacionView(APIView):
         df = pd.DataFrame(data)
         estadisticas = df.groupby('clasificacion')['edad'].describe().fillna(0).to_dict()
         return Response(estadisticas, status=status.HTTP_200_OK)
+
+class GeneroCountView(APIView):
+    permission_classes = [IsAdminOrReadOnly]
+    def get(self, request):
+        data = Personas.objects.filter(is_delete=False).values('genero')
+        df = pd.DataFrame(data)
+        conteo = df['genero'].value_counts().to_dict()
+        return Response(conteo, status=status.HTTP_200_OK)
