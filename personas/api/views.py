@@ -52,20 +52,9 @@ class PredecirObesidadView(APIView):
         consumo_comida_rapida = serializer.validated_data['consumo_comida_rapida']
         comida_diaria = serializer.validated_data['comida_diaria']
         imc = peso / (estatura ** 2)
-        datos_entrada = pd.DataFrame({
-            'edad': [edad],
-            'genero': [genero],
-            'peso': [peso],
-            'estatura': [estatura],
-            'imc': [imc],
-            'antecedentes_familiares': [antecedentes_familiares],
-            'condiciones_medicas': [condiciones_medicas],
-            'consumo_medicamentos': [consumo_medicamentos],
-            'estres_ansiedad': [estres_ansiedad],
-            'actividades_fisicas': [actividades_fisicas],
-            'consumo_comida_rapida': [consumo_comida_rapida],
-            'comida_diaria': [comida_diaria],
-        })
+        datos_entrada = pd.DataFrame([[
+        edad,genero, peso, estatura,antecedentes_familiares,condiciones_medicas,consumo_medicamentos,estres_ansiedad,actividades_fisicas,comida_diaria,consumo_comida_rapida,imc
+        ]])
         datos_entrada = scaler.transform(datos_entrada)
         try:
            prediccion = model.predict(datos_entrada)
@@ -94,20 +83,10 @@ class PredecirObesidadApkView(APIView):
         consumo_comida_rapida = serializer.validated_data['consumo_comida_rapida']
         comida_diaria = serializer.validated_data['comida_diaria']
         imc = peso / (estatura ** 2)
-        datos_entrada = pd.DataFrame({
-            'edad': [edad],
-            'genero': [genero],
-            'peso': [peso],
-            'estatura': [estatura],
-            'imc': [imc],
-            'antecedentes_familiares': [antecedentes_familiares],
-            'condiciones_medicas': [condiciones_medicas],
-            'consumo_medicamentos': [consumo_medicamentos],
-            'estres_ansiedad': [estres_ansiedad],
-            'actividades_fisicas': [actividades_fisicas],
-            'consumo_comida_rapida': [consumo_comida_rapida],
-            'comida_diaria': [comida_diaria],
-        })
+        datos_entrada = pd.DataFrame([[
+        edad,genero, peso, estatura,antecedentes_familiares,condiciones_medicas,consumo_medicamentos,estres_ansiedad,actividades_fisicas,comida_diaria,consumo_comida_rapida,imc
+        ]])
+        print(imc)
         datos_entrada = scaler.transform(datos_entrada)
         try:
            prediccion = model.predict(datos_entrada)
@@ -136,7 +115,7 @@ class EntrenarYPredecirApkView(APIView):
         data['clasificacion'] = label_encoder.fit_transform(data['clasificacion'])  # Codificar la variable objetivo
 
         # Separar características y variable objetivo
-        X = data[['edad','genero', 'peso', 'estatura', 'imc','antecedentes_familiares','condiciones_medicas','consumo_medicamentos','estres_ansiedad','actividades_fisicas','comida_diaria','consumo_comida_rapida', 'clasificacion']]
+        X = data[['edad','genero', 'peso', 'estatura','antecedentes_familiares','condiciones_medicas','consumo_medicamentos','estres_ansiedad','actividades_fisicas','comida_diaria','consumo_comida_rapida','imc']]
         y = data['clasificacion']
         y = to_categorical(y)  # Convertir las etiquetas a one-hot encoding
 
@@ -177,20 +156,9 @@ class EntrenarYPredecirApkView(APIView):
             estatura = entrada['estatura']
             imc = peso / (estatura ** 2)
 
-            datos_entrada = pd.DataFrame({
-                'edad': [edad],
-                'genero': [genero],
-                'peso': [peso],
-                'estatura': [estatura],
-                'imc': [imc],
-                'antecedentes_familiares': [antecedentes_familiares],
-                'condiciones_medicas': [condiciones_medicas],
-                'consumo_medicamentos': [consumo_medicamentos],
-                'estres_ansiedad': [estres_ansiedad],
-                'actividades_fisicas': [actividades_fisicas],
-                'consumo_comida_rapida': [consumo_comida_rapida],
-                'comida_diaria': [comida_diaria],
-            })
+            datos_entrada = pd.DataFrame([[
+            edad,genero, peso, estatura,antecedentes_familiares,condiciones_medicas,consumo_medicamentos,estres_ansiedad,actividades_fisicas,comida_diaria,consumo_comida_rapida,imc
+            ]])
             datos_entrada = scaler.transform(datos_entrada)
             prediccion = model.predict(datos_entrada)
             prediccion_clase = np.argmax(prediccion, axis=1)
@@ -218,7 +186,8 @@ class EntrenarYPredecirView(APIView):
         data['clasificacion'] = label_encoder.fit_transform(data['clasificacion'])  # Codificar la variable objetivo
 
         # Separar características y variable objetivo
-        X = data[['edad','genero', 'peso', 'estatura', 'imc','antecedentes_familiares','condiciones_medicas','consumo_medicamentos','estres_ansiedad','actividades_fisicas','comida_diaria','consumo_comida_rapida', 'clasificacion']]
+        X = data[['edad','genero', 'peso', 'estatura','antecedentes_familiares','condiciones_medicas','consumo_medicamentos','estres_ansiedad','actividades_fisicas','comida_diaria','consumo_comida_rapida','imc']]
+      
         y = data['clasificacion']
         y = to_categorical(y)  # Convertir las etiquetas a one-hot encoding
 
@@ -258,20 +227,9 @@ class EntrenarYPredecirView(APIView):
             consumo_comida_rapida = entrada['consumo_comida_rapida']
             comida_diaria = entrada['comida_diaria']
             imc = peso / (estatura ** 2)
-            datos_entrada = pd.DataFrame({
-                'edad': [edad],
-                'genero': [genero],
-                'peso': [peso],
-                'estatura': [estatura],
-                'imc': [imc],
-                'antecedentes_familiares': [antecedentes_familiares],
-                'condiciones_medicas': [condiciones_medicas],
-                'consumo_medicamentos': [consumo_medicamentos],
-                'estres_ansiedad': [estres_ansiedad],
-                'actividades_fisicas': [actividades_fisicas],
-                'consumo_comida_rapida': [consumo_comida_rapida],
-                'comida_diaria': [comida_diaria],
-            })
+            datos_entrada = pd.DataFrame([[
+            edad,genero, peso, estatura,antecedentes_familiares,condiciones_medicas,consumo_medicamentos,estres_ansiedad,actividades_fisicas,comida_diaria,consumo_comida_rapida,imc
+            ]])
             datos_entrada = scaler.transform(datos_entrada)
             prediccion = model.predict(datos_entrada)
             prediccion_clase = np.argmax(prediccion, axis=1)
