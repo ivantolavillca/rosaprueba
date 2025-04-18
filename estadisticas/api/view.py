@@ -65,3 +65,11 @@ class GeneroCountView(APIView):
         df = pd.DataFrame(data)
         conteo = df['genero'].value_counts().to_dict()
         return Response(conteo, status=status.HTTP_200_OK)
+class ConteoPorClasificacionView(APIView):
+    permission_classes = [IsAdminOrReadOnly]
+
+    def get(self, request):
+        data = Personas.objects.filter(is_delete=False).values('clasificacion')
+        df = pd.DataFrame(data)
+        conteo = df['clasificacion'].value_counts().to_dict()
+        return Response(conteo, status=status.HTTP_200_OK)
