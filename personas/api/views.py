@@ -248,7 +248,7 @@ class PersonaApiViewSet(ModelViewSet):
     queryset = Personas.objects.filter(is_delete=False)
     serializer_class = PersonaSerializer
     filter_backends = [SearchFilter]
-    search_fields = ['nombre_completo','genero', 'edad', 'peso', 'estatura']
+    search_fields = ['nombre_completo', 'edad', 'peso', 'estatura']
     pagination_class = CustomLimitOffsetPagination
     def perform_destroy(self, instance):
         instance.is_delete = True
